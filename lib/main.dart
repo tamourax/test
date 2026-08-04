@@ -12,7 +12,6 @@ void main() {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              height: 400,
               width: 100,
               color: Colors.yellow,
               child: Center(
