@@ -5,13 +5,13 @@ void main() {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.black87,
         body: Row(
           spacing: 20,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
+              height: 100,
               width: 100,
               color: Colors.yellow,
               child: Center(
