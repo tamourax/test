@@ -1,16 +1,224 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:test/row_Widget.dart';
 
-
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: RowWidget(),
+    return MaterialApp(debugShowCheckedModeBanner: false, home: NewsCard());
+  }
+}
+
+final dio = Dio();
+
+
+void getHttp() async {
+  final response = await dio.get(
+    'https://newsapi.org/v2/everything?q=bitcoin&apiKey=e4ea152c161c4c91a9faad351c15e97c',
+  );
+  Map<String, dynamic> data = response.data;
+  List<dynamic> articles = data['articles'];
+
+
+
+for (var article in articles) {
+
+  print(article['title']);
+
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+class NewsCard extends StatelessWidget {
+  const NewsCard({super.key});
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('News Card')),
+
+      body: ListView.builder(
+        itemCount: 10,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NewsDetails()),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: Image.network(
+                      'https://images.unsplash.com/photo-1504711434969-e33886168f5c',
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Bitcoin Reaches New High',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        Text(
+                          'Bitcoin price continues to rise as investors show strong interest in the cryptocurrency market.',
+                          style: TextStyle(fontSize: 15, color: Colors.grey),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'News',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward, color: Colors.blue),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class NewsDetails extends StatelessWidget {
+  const NewsDetails({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+
+      appBar: AppBar(title: const Text('News Details'), centerTitle: true),
+
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              "https://images.unsplash.com/photo-1504711434969-e33886168f5c",
+              width: double.infinity,
+              height: 250,
+              fit: BoxFit.cover,
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Bitcoin Reaches New High",
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      "Bitcoin reaches new high as institutional adoption accelerates.",
+                      style: const TextStyle(
+                        fontSize: 17,
+                        height: 1.6,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    children: const [
+                      Icon(Icons.article_outlined, color: Colors.blue),
+                      SizedBox(width: 8),
+                      Text(
+                        'News Article',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
