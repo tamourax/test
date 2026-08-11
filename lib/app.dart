@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:test/row_Widget.dart';
 
 class MyApp extends StatelessWidget {
@@ -13,39 +14,58 @@ class MyApp extends StatelessWidget {
 
 final dio = Dio();
 
-
-void getHttp() async {
+Future<List<ArticlesModel>> getNewsData() async {
   final response = await dio.get(
     'https://newsapi.org/v2/everything?q=bitcoin&apiKey=e4ea152c161c4c91a9faad351c15e97c',
   );
   Map<String, dynamic> data = response.data;
   List<dynamic> articles = data['articles'];
+  List<ArticlesModel> articlesList = [];
 
-
-
-for (var article in articles) {
-
-  print(article['title']);
-
+  for (var article in articles) {
+    ArticlesModel articlesModel = ArticlesModel(
+      title: article['title'],
+      description: article['description'],
+      urlToImage: article['urlToImage'],
+    );
+    articlesList.add(articlesModel);
   }
-
-
+  return articlesList;
 }
 
+class ArticlesModel {
+  String? title;
+  String? description;
+  String? urlToImage;
 
+  ArticlesModel({
+    required this.title,
+    required this.description,
+    required this.urlToImage,
+  });
+}
 
+class NewsCard extends StatefulWidget {
+  NewsCard({super.key});
 
+  @override
+  State<NewsCard> createState() => _NewsCardState();
+}
 
+class _NewsCardState extends State<NewsCard> {
+  List<ArticlesModel> newsData = [];
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    getNews();
+  }
 
-
-
-
-
-
-
-class NewsCard extends StatelessWidget {
-  const NewsCard({super.key});
-  
+  Future<void> getNews() async {
+    newsData = await getNewsData();
+    setState(() {});
+    isLoading = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +73,7 @@ class NewsCard extends StatelessWidget {
       appBar: AppBar(title: const Text('News Card')),
 
       body: ListView.builder(
-        itemCount: 10,
+        itemCount: newsData.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
@@ -62,73 +82,77 @@ class NewsCard extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const NewsDetails()),
               );
             },
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
+            child: Skeletonizer(
+              enabled: isLoading,
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     ),
-                    child: Image.network(
-                      'https://images.unsplash.com/photo-1504711434969-e33886168f5c',
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                      child: Image.network(
+                        newsData[index].urlToImage ??
+                            "https://images.unsplash.com/photo-1504711434969-e33886168f5c",
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Bitcoin Reaches New High',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        SizedBox(height: 10),
-
-                        Text(
-                          'Bitcoin price continues to rise as investors show strong interest in the cryptocurrency market.',
-                          style: TextStyle(fontSize: 15, color: Colors.grey),
-                        ),
-
-                        SizedBox(height: 16),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'News',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            newsData[index].title ?? "NO TITLEEEE",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                            Icon(Icons.arrow_forward, color: Colors.blue),
-                          ],
-                        ),
-                      ],
+                          ),
+
+                          SizedBox(height: 10),
+
+                          Text(
+                            newsData[index].description ?? "NO DESC",
+                            style: TextStyle(fontSize: 15, color: Colors.grey),
+                          ),
+
+                          SizedBox(height: 16),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'News',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward, color: Colors.blue),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -223,7 +247,6 @@ class NewsDetails extends StatelessWidget {
   }
 }
 
-
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -237,10 +260,7 @@ class LoginPage extends StatelessWidget {
           children: [
             const Text(
               'Login',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 30),
