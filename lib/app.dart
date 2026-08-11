@@ -1,14 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:test/row_Widget.dart';
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: NewsCard());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage());
   }
 }
 
@@ -18,8 +17,8 @@ Future<List<ArticlesModel>> getNewsData() async {
   final response = await dio.get(
     'https://newsapi.org/v2/everything?q=bitcoin&apiKey=e4ea152c161c4c91a9faad351c15e97c',
   );
-  Map<String, dynamic> data = response.data;
-  List<dynamic> articles = data['articles'];
+
+  List<dynamic> articles = response.data['articles'];
   List<ArticlesModel> articlesList = [];
 
   for (var article in articles) {
@@ -46,7 +45,7 @@ class ArticlesModel {
 }
 
 class NewsCard extends StatefulWidget {
-  NewsCard({super.key});
+  const NewsCard({super.key});
 
   @override
   State<NewsCard> createState() => _NewsCardState();
